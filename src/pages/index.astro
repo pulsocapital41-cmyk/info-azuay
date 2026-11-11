@@ -6,31 +6,378 @@ import NewsCard from '../components/NewsCard.astro';
 const allNews = (await getCollection('noticias')).sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
 );
+
+// Lead stories for the Newspaper Big Grid
+const heroLead = allNews[0];
+const heroSubs = allNews.slice(1, 5);
+
+// Stream stories
+const streamNews = allNews.slice(1);
+const popularNews = [...allNews].sort(() => 0.5 - Math.random()).slice(0, 5);
+const seguridadNews = allNews.filter((n) => n.data.category === 'Seguridad').slice(0, 2);
+const movilidadNews = allNews.filter((n) => n.data.category === 'Movilidad').slice(0, 2);
 ---
 
 <BaseLayout>
-  <section class="grid-portal container">
-    <div class="news-cards-grid">
-      {allNews.map((story, idx) => (
-        <NewsCard article={story} featured={idx === 0} />
-      ))}
+  <!-- 1. NEWSPAPER HERO BIG GRID -->
+  <section class="td-hero-section container">
+    <div class="td-big-grid">
+      <div class="td-big-grid__lead">
+        {heroLead && <NewsCard article={heroLead} variant="hero-main" />}
+      </div>
+      <div class="td-big-grid__subs">
+        {heroSubs.map((story) => (
+          <NewsCard article={story} variant="hero-sub" />
+        ))}
+      </div>
     </div>
   </section>
+
+  <!-- 2. TWO-COLUMN NEWSPAPER CONTENT STREAM -->
+  <div class="container td-main-layout">
+    <!-- Left Column (Primary News Stream) -->
+    <main class="td-primary-stream">
+      <!-- Block Header: Lo Último -->
+      <div class="td-block-header td-block-header--red">
+        <span class="td-block-title">
+          <span class="live-pulse"></span>
+          Lo Último en Azuay
+        </span>
+        <span class="td-block-subtitle">Actualización en tiempo real</span>
+      </div>
+
+      <div class="td-stream-list">
+        {streamNews.map((article) => (
+          <NewsCard article={article} variant="horizontal" />
+        ))}
+      </div>
+
+      <!-- Category Spotlight: Seguridad & Ciudadanía -->
+      {seguridadNews.length > 0 && (
+        <section class="td-spotlight-section">
+          <div class="td-block-header">
+            <span class="td-block-title td-block-title--dark">Seguridad y Orden</span>
+            <span class="td-block-subtitle">Operativos y prevención en el Austro</span>
+          </div>
+          <div class="td-spotlight-grid">
+            {seguridadNews.map((art) => (
+              <NewsCard article={art} variant="hero-sub" />
+            ))}
+          </div>
+        </section>
+      )}
+
+      <!-- Category Spotlight: Movilidad & Vialidad -->
+      {movilidadNews.length > 0 && (
+        <section class="td-spotlight-section">
+          <div class="td-block-header td-block-header--red">
+            <span class="td-block-title">Movilidad y Conectividad</span>
+            <span class="td-block-subtitle">Vías del Azuay y Tranvía de Cuenca</span>
+          </div>
+          <div class="td-spotlight-grid">
+            {movilidadNews.map((art) => (
+              <NewsCard article={art} variant="hero-sub" />
+            ))}
+          </div>
+        </section>
+      )}
+    </main>
+
+    <!-- Right Column (Sidebar: Popular + Road Status + Citizen Alerts) -->
+    <aside class="td-sidebar">
+      <!-- Widget: Más Leídas con Números Grandes -->
+      <div class="td-widget td-widget--ranked">
+        <div class="td-block-header">
+          <span class="td-block-title td-block-title--dark">Más Leídas</span>
+          <span class="td-block-subtitle">Hoy en Info Azuay</span>
+        </div>
+        <div class="td-ranked-list">
+          {popularNews.map((item, index) => (
+            <NewsCard article={item} variant="sidebar-ranked" rank={index + 1} />
+          ))}
+        </div>
+      </div>
+
+      <!-- Widget: Estado de Vías en Vivo -->
+      <div class="td-widget td-widget-roads">
+        <div class="td-widget-roads__header">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+          </svg>
+          <h4>Estado Vial en Vivo</h4>
+        </div>
+        <ul class="td-roads-list">
+          <li class="td-road-item">
+            <span class="td-road-item__name">Cuenca - Molleturo - El Empalme</span>
+            <span class="td-road-badge td-road-badge--warning">Paso km 49 controlado</span>
+          </li>
+          <li class="td-road-item">
+            <span class="td-road-item__name">Cuenca - Girón - Pasaje</span>
+            <span class="td-road-badge td-road-badge--ok">Habilitada normal</span>
+          </li>
+          <li class="td-road-item">
+            <span class="td-road-item__name">Cuenca - Azogues - Biblián</span>
+            <span class="td-road-badge td-road-badge--ok">Tráfico fluido</span>
+          </li>
+          <li class="td-road-item">
+            <span class="td-road-item__name">Tranvía Cuatro Ríos</span>
+            <span class="td-road-badge td-road-badge--ok">Operación al 100%</span>
+          </li>
+        </ul>
+        <p class="td-roads-footer">Fuente: MTOP Azuay / CTE / EMOV EP</p>
+      </div>
+
+      <!-- Widget: Denuncia Ciudadana -->
+      <div class="td-widget td-widget-citizen">
+        <div class="td-widget-citizen__icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+        </div>
+        <h4 class="td-widget-citizen__title">¿Tienes una denuncia en tu barrio?</h4>
+        <p class="td-widget-citizen__desc">
+          En Info Azuay le damos voz a los ciudadanos de Cuenca y toda la provincia. Envíanos fotos, reportes o alertas comunitarias.
+        </p>
+        <a href="mailto:cuencanexos@gmail.com" class="td-widget-citizen__btn">
+          <span>Enviar Denuncia</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"/>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+        </a>
+      </div>
+    </aside>
+  </div>
 </BaseLayout>
 
 <style>
-  .grid-portal {
-    padding-block: 2.25rem 3.5rem;
+  /* 1. Hero Big Grid */
+  .td-hero-section {
+    padding-top: 1.5rem;
+    padding-bottom: 2rem;
   }
 
-  .news-cards-grid {
+  .td-big-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    column-gap: 1.5rem;
-    row-gap: 0;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
   }
 
-  .news-cards-grid > :global(.grid-card) {
-    margin-block-end: 1.5rem;
+  @media (min-width: 900px) {
+    .td-big-grid {
+      grid-template-columns: 1.25fr 1fr;
+      gap: 0.75rem;
+    }
+  }
+
+  .td-big-grid__subs {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  @media (min-width: 560px) {
+    .td-big-grid__subs {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  /* 2. Main Two-Column Layout */
+  .td-main-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+    padding-bottom: 4rem;
+  }
+
+  @media (min-width: 980px) {
+    .td-main-layout {
+      grid-template-columns: 1fr 340px;
+    }
+  }
+
+  /* Primary Stream */
+  .td-primary-stream {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .td-stream-list {
+    background: #FFFFFF;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    padding: 0.5rem 1.25rem;
+  }
+
+  .td-spotlight-section {
+    margin-top: 2.75rem;
+  }
+
+  .td-spotlight-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  @media (min-width: 600px) {
+    .td-spotlight-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  /* Sidebar Widgets */
+  .td-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 2.25rem;
+  }
+
+  .td-widget {
+    background: #FFFFFF;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    padding: 1.25rem;
+  }
+
+  .td-widget--ranked {
+    padding: 1.25rem;
+  }
+
+  /* Widget Roads */
+  .td-widget-roads {
+    background: #111111;
+    color: #FFFFFF;
+    border: 1px solid #222222;
+  }
+
+  .td-widget-roads__header {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: var(--color-accent-red);
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #2A2A2A;
+  }
+
+  .td-widget-roads__header h4 {
+    font-family: var(--font-heading);
+    font-size: 0.95rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #FFFFFF;
+  }
+
+  .td-roads-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .td-road-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-size: 0.8rem;
+    padding-bottom: 0.65rem;
+    border-bottom: 1px solid #1F1F1F;
+  }
+
+  .td-road-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .td-road-item__name {
+    font-weight: 600;
+    color: #E5E7EB;
+  }
+
+  .td-road-badge {
+    font-family: var(--font-heading);
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 0.15rem 0.5rem;
+    border-radius: 2px;
+    width: fit-content;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .td-road-badge--ok {
+    background: rgba(34, 197, 94, 0.2);
+    color: #4ADE80;
+  }
+
+  .td-road-badge--warning {
+    background: rgba(234, 179, 8, 0.2);
+    color: #FACC15;
+  }
+
+  .td-roads-footer {
+    font-size: 0.68rem;
+    color: #888888;
+    margin-top: 1rem;
+    text-align: right;
+  }
+
+  /* Widget Citizen */
+  .td-widget-citizen {
+    background: #FFF5F5;
+    border: 1px solid #FED7D7;
+    text-align: center;
+    padding: 1.75rem 1.25rem;
+  }
+
+  .td-widget-citizen__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--color-accent-red);
+    color: #FFFFFF;
+    margin-bottom: 0.85rem;
+  }
+
+  .td-widget-citizen__title {
+    font-family: var(--font-heading);
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--color-ink);
+    margin-bottom: 0.45rem;
+  }
+
+  .td-widget-citizen__desc {
+    font-size: 0.82rem;
+    color: var(--color-ink-secondary);
+    line-height: 1.5;
+    margin-bottom: 1.25rem;
+  }
+
+  .td-widget-citizen__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: var(--color-accent-red);
+    color: #FFFFFF;
+    font-family: var(--font-heading);
+    font-size: 0.78rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.65rem 1.25rem;
+    border-radius: 3px;
+    width: 100%;
+    transition: background 0.15s ease;
+  }
+
+  .td-widget-citizen__btn:hover {
+    background: var(--color-accent-red-hover);
+    color: #FFFFFF;
   }
 </style>

@@ -5,18 +5,18 @@ import NewsCard from '../../components/NewsCard.astro';
 
 export async function getStaticPaths() {
   const categories = [
-    { slug: 'cuenca', name: 'Cuenca', displayName: 'Cuenca', desc: 'Noticias locales, gestión cantonal, obras urbanas y actualidad en la Atenas del Ecuador.' },
-    { slug: 'seguridad', name: 'Seguridad', displayName: 'Seguridad', desc: 'Operativos policiales, prevención comunitaria, seguridad vial y orden ciudadano en Azuay.' },
-    { slug: 'movilidad', name: 'Movilidad', displayName: 'Movilidad', desc: 'Tranvía de Cuenca, vialidad del Austro, conexiones interprovinciales y transporte público.' },
-    { slug: 'comunidad', name: 'Comunidad', displayName: 'Comunidad', desc: 'Barrios cuencanos, servicios municipales, ambiente, educación y denuncias ciudadanas.' },
-    { slug: 'opinion', name: 'Opinión', displayName: 'Opinión', desc: 'Análisis, debate y columnas ciudadanas sobre el desarrollo del Azuay y el Austro.' },
+    { slug: 'cuenca', name: 'Cuenca', displayName: 'Cuenca Urbana', desc: 'Noticias locales, gestión cantonal, obras de regeneración y vida ciudadana en la Atenas del Ecuador.' },
+    { slug: 'seguridad', name: 'Seguridad', displayName: 'Seguridad & Justicia', desc: 'Operativos policiales, prevención ciudadana, orden vial y acciones conjuntas en la provincia del Azuay.' },
+    { slug: 'movilidad', name: 'Movilidad', displayName: 'Movilidad & Conectividad', desc: 'Tranvía de Cuenca, estado de las vías interprovinciales hacia Guayas y El Oro, y transporte público.' },
+    { slug: 'comunidad', name: 'Comunidad', displayName: 'Comunidad & Barrios', desc: 'Voz barrial, servicios municipales, agua potable de ETAPA, medio ambiente y denuncias ciudadanas.' },
+    { slug: 'opinion', name: 'Opinión', displayName: 'Tribuna de Opinión', desc: 'Análisis, columnas y debate plural sobre el desarrollo estratégico del Azuay y el Austro.' },
   ];
 
   const allNews = await getCollection('noticias');
 
   return categories.map((cat) => {
     const filtered = allNews
-      .filter((item) => item.data.category === cat.name || item.data.category.toLowerCase() === cat.name.toLowerCase())
+      .filter((item) => item.data.category === cat.name || item.data.category.toLowerCase() === cat.name.toLowerCase() || item.data.category.toLowerCase() === cat.slug)
       .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
     return {
@@ -25,82 +25,125 @@ export async function getStaticPaths() {
         categoryName: cat.displayName,
         categoryDescription: cat.desc,
         articles: filtered,
+        allNewsList: allNews,
       },
     };
   });
 }
 
-const { categoryName, categoryDescription, articles } = Astro.props;
+const { categoryName, categoryDescription, articles, allNewsList } = Astro.props;
+const popularSide = [...allNewsList].sort(() => 0.5 - Math.random()).slice(0, 5);
 ---
 
 <BaseLayout
   title={`${categoryName} — Info Azuay`}
   description={categoryDescription}
 >
-  <section class="category-page container">
-    <header class="category-chip-bar">
-      <span class="kicker">{categoryName}</span>
-      <p class="category-chip-bar__desc">{categoryDescription}</p>
-    </header>
+  <div class="container td-cat-container">
+    <!-- Category Block Header -->
+    <div class="td-block-header td-block-header--red">
+      <span class="td-block-title">{categoryName}</span>
+      <span class="td-block-subtitle">{categoryDescription}</span>
+    </div>
 
-    {articles.length > 0 ? (
-      <div class="category-grid">
-        {articles.map((article) => (
-          <NewsCard article={article} />
-        ))}
-      </div>
-    ) : (
-      <div class="empty-state">
-        <p>Pronto publicaremos nuevas notas en la sección de {categoryName}.</p>
-        <a href="/" class="empty-state__link">Ver todas las noticias →</a>
-      </div>
-    )}
-  </section>
+    <div class="td-cat-layout">
+      <!-- Main Category Stream -->
+      <main class="td-cat-stream">
+        {articles.length > 0 ? (
+          <div class="td-cat-stream__list">
+            {articles.map((article) => (
+              <NewsCard article={article} variant="horizontal" />
+            ))}
+          </div>
+        ) : (
+          <div class="td-cat-empty">
+            <h3>Pronto más cobertura en {categoryName}</h3>
+            <p>Nuestra mesa de redacción está procesando nuevas informaciones para esta sección.</p>
+            <a href="/" class="td-cat-empty__btn">Volver a la Portada</a>
+          </div>
+        )}
+      </main>
+
+      <!-- Sidebar -->
+      <aside class="td-cat-sidebar">
+        <div class="td-widget td-widget--ranked">
+          <div class="td-block-header">
+            <span class="td-block-title td-block-title--dark">Más Leídas</span>
+          </div>
+          <div class="td-ranked-list">
+            {popularSide.map((item, index) => (
+              <NewsCard article={item} variant="sidebar-ranked" rank={index + 1} />
+            ))}
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
 </BaseLayout>
 
 <style>
-  .category-page {
-    padding-block: 2rem 3.5rem;
+  .td-cat-container {
+    padding-top: 2rem;
+    padding-bottom: 4rem;
   }
 
-  .category-chip-bar {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.85rem;
-    margin-block-end: 1.75rem;
-    padding-block-end: 1rem;
-    border-bottom: 1px solid var(--color-rule-light);
-  }
-
-  .category-chip-bar__desc {
-    font-size: 0.92rem;
-    color: var(--color-ink-secondary);
-  }
-
-  .category-grid {
+  .td-cat-layout {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    column-gap: 1.5rem;
-    row-gap: 0;
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
   }
 
-  .category-grid > :global(.grid-card) {
-    margin-block-end: 1.5rem;
+  @media (min-width: 980px) {
+    .td-cat-layout {
+      grid-template-columns: 1fr 340px;
+    }
   }
 
-  .empty-state {
-    background: var(--color-surface);
-    border: 1px solid var(--color-rule-light);
+  .td-cat-stream__list {
+    background: #FFFFFF;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    padding: 0.5rem 1.25rem;
+  }
+
+  .td-cat-empty {
+    background: #FFFFFF;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
     padding: 3rem 2rem;
     text-align: center;
-    border-radius: 16px;
   }
 
-  .empty-state__link {
+  .td-cat-empty h3 {
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--color-ink);
+    margin-bottom: 0.5rem;
+  }
+
+  .td-cat-empty p {
+    font-size: 0.9rem;
+    color: var(--color-ink-secondary);
+    margin-bottom: 1.5rem;
+  }
+
+  .td-cat-empty__btn {
     display: inline-block;
-    margin-block-start: 1rem;
-    font-weight: 700;
-    color: var(--color-brand-blue);
+    background: var(--color-accent-red);
+    color: #FFFFFF;
+    font-family: var(--font-heading);
+    font-size: 0.78rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    padding: 0.65rem 1.25rem;
+    border-radius: 3px;
+  }
+
+  .td-widget {
+    background: #FFFFFF;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    padding: 1.25rem;
   }
 </style>

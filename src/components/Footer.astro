@@ -2,107 +2,287 @@
 const year = new Date().getFullYear();
 ---
 
-<footer class="modern-footer">
-  <div class="container modern-footer__inner">
-    <div class="modern-footer__brand">
-      <img
-        src="/logo-info-azuay.png"
-        alt="Info Azuay"
-        class="modern-footer__logo"
-        width="150"
-        height="108"
-      />
-      <div>
-        <strong class="modern-footer__name">INFO AZUAY</strong>
-        <p class="modern-footer__tagline">El pulso informativo del Austro ecuatoriano · Cuenca, Azuay</p>
+<footer class="td-footer">
+  <div class="td-footer__accent-bar"></div>
+  <div class="container td-footer__inner">
+    <div class="td-footer__grid">
+      <!-- Col 1: Brand & About -->
+      <div class="td-footer__col">
+        <a href="/" class="td-footer__brand">
+          <img
+            src="/logo-info-azuay.png"
+            alt="Info Azuay"
+            class="td-footer__logo"
+            width="180"
+            height="120"
+          />
+          <span class="td-footer__brand-title">INFO <strong>AZUAY</strong></span>
+        </a>
+        <p class="td-footer__desc">
+          Periódico digital independiente comprometido con la verdad, la seguridad ciudadana y el desarrollo del Azuay y el Austro ecuatoriano.
+        </p>
+        <div class="td-footer__contact">
+          <span class="td-footer__contact-item">
+            📍 Cuenca, Azuay, Ecuador
+          </span>
+          <span class="td-footer__contact-item">
+            ✉️ cuencanexos@gmail.com
+          </span>
+        </div>
+      </div>
+
+      <!-- Col 2: Secciones -->
+      <div class="td-footer__col">
+        <h4 class="td-footer__heading">Secciones</h4>
+        <ul class="td-footer__links">
+          <li><a href="/categoria/cuenca">Cuenca Urbana</a></li>
+          <li><a href="/categoria/seguridad">Seguridad & Justicia</a></li>
+          <li><a href="/categoria/movilidad">Movilidad & Vías</a></li>
+          <li><a href="/categoria/comunidad">Comunidad & Barrios</a></li>
+          <li><a href="/categoria/opinion">Tribuna de Opinión</a></li>
+          <li><a href="/rss.xml">Canal RSS</a></li>
+        </ul>
+      </div>
+
+      <!-- Col 3: Monitoreo & Servicios -->
+      <div class="td-footer__col">
+        <h4 class="td-footer__heading">Servicios en Vivo</h4>
+        <ul class="td-footer__services">
+          <li>
+            <strong>Tranvía Cuatro Ríos:</strong>
+            <span>Lunes a Domingo 06:00 - 23:30</span>
+          </li>
+          <li>
+            <strong>Vía Cuenca-Molleturo:</strong>
+            <span>Paso km 49 en observación</span>
+          </li>
+          <li>
+            <strong>ETAPA EP:</strong>
+            <span>Monitoreo de caudales 24/7</span>
+          </li>
+          <li>
+            <strong>Consejo de Seguridad:</strong>
+            <span>Cámaras conectadas ECU 911</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Col 4: Redacción & Central -->
+      <div class="td-footer__col">
+        <h4 class="td-footer__heading">Sala de Redacción</h4>
+        <p class="td-footer__desc">
+          Plataforma editorial con verificación de hechos y actualización continua en tiempo real.
+        </p>
+        <a href="https://central.neuronamedios.com" target="_blank" rel="noopener noreferrer" class="td-footer__central-btn">
+          <span>Acceder a Central Editorial</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+            <polyline points="15 3 21 3 21 9"/>
+            <line x1="10" x2="21" y1="14" y2="3"/>
+          </svg>
+        </a>
       </div>
     </div>
 
-    <ul class="modern-footer__links">
-      <li><a href="/">Todas</a></li>
-      <li><a href="/categoria/cuenca">Cuenca</a></li>
-      <li><a href="/categoria/seguridad">Seguridad</a></li>
-      <li><a href="/categoria/movilidad">Movilidad</a></li>
-      <li><a href="/categoria/comunidad">Comunidad</a></li>
-      <li><a href="/categoria/opinion">Opinión</a></li>
-      <li><a href="/rss.xml">RSS</a></li>
-      <li><a href="https://central.neuronamedios.com" target="_blank" rel="noopener noreferrer">Central Editorial</a></li>
-    </ul>
-
-    <p class="modern-footer__copy">© {year} Info Azuay. Todos los derechos reservados.</p>
+    <div class="td-footer__bottom">
+      <p class="td-footer__copy">
+        © {year} Info Azuay. Todos los derechos reservados. Edición digital protegida.
+      </p>
+      <div class="td-footer__bottom-links">
+        <a href="/">Inicio</a>
+        <span>·</span>
+        <a href="/rss.xml">RSS</a>
+        <span>·</span>
+        <a href="https://central.neuronamedios.com" target="_blank" rel="noopener noreferrer">Central Editorial</a>
+      </div>
+    </div>
   </div>
 </footer>
 
 <style>
-  .modern-footer {
-    margin-block-start: auto;
-    background: var(--color-brand-blue);
-    color: #E2E8F0;
-    border-top: 3px solid var(--color-brand-gold);
-    padding-block: 2.25rem;
+  .td-footer {
+    background: #0E0E0E;
+    color: #A0AEC0;
+    margin-top: auto;
+    border-top: 1px solid #1F1F1F;
+    position: relative;
   }
 
-  .modern-footer__inner {
+  .td-footer__accent-bar {
+    height: 3px;
+    background: var(--color-accent-red);
+    width: 100%;
+  }
+
+  .td-footer__inner {
+    padding-top: 3.5rem;
+    padding-bottom: 2rem;
+  }
+
+  .td-footer__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+    padding-bottom: 3rem;
+    border-bottom: 1px solid #1F1F1F;
+  }
+
+  @media (min-width: 640px) {
+    .td-footer__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .td-footer__grid {
+      grid-template-columns: 1.4fr 1fr 1fr 1.2fr;
+    }
+  }
+
+  .td-footer__col {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .td-footer__brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .td-footer__logo {
+    height: 44px;
+    width: auto;
+    object-fit: contain;
+  }
+
+  .td-footer__brand-title {
+    font-family: var(--font-heading);
+    font-size: 1.35rem;
+    font-weight: 900;
+    color: #FFFFFF;
+  }
+
+  .td-footer__brand-title strong {
+    color: var(--color-accent-red);
+  }
+
+  .td-footer__desc {
+    font-size: 0.82rem;
+    line-height: 1.6;
+    color: #9CA3AF;
+  }
+
+  .td-footer__contact {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    font-size: 0.78rem;
+    color: #D1D5DB;
+  }
+
+  .td-footer__heading {
+    font-family: var(--font-heading);
+    font-size: 0.92rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #FFFFFF;
+    position: relative;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--color-accent-red);
+    display: inline-block;
+    width: fit-content;
+  }
+
+  .td-footer__links {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    font-family: var(--font-heading);
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .td-footer__links a:hover {
+    color: var(--color-accent-red);
+    padding-left: 4px;
+  }
+
+  .td-footer__services {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    font-size: 0.78rem;
+  }
+
+  .td-footer__services strong {
+    display: block;
+    color: #E5E7EB;
+  }
+
+  .td-footer__services span {
+    color: #9CA3AF;
+  }
+
+  .td-footer__central-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--color-accent-red);
+    color: #FFFFFF;
+    font-family: var(--font-heading);
+    font-size: 0.76rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.65rem 1.15rem;
+    border-radius: 3px;
+    width: fit-content;
+    transition: background 0.15s ease;
+  }
+
+  .td-footer__central-btn:hover {
+    background: var(--color-accent-red-hover);
+    color: #FFFFFF;
+  }
+
+  .td-footer__bottom {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    gap: 1.5rem;
+    gap: 1rem;
+    padding-top: 1.75rem;
+    font-size: 0.76rem;
     text-align: center;
   }
 
-  .modern-footer__brand {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    text-align: left;
-  }
-
-  .modern-footer__logo {
-    background: #FFFFFF;
-    padding: 0.45rem;
-    border-radius: 10px;
-    block-size: 58px;
-    inline-size: auto;
-  }
-
-  .modern-footer__name {
-    display: block;
-    font-size: 1rem;
-    font-weight: 800;
-    letter-spacing: 0.04em;
-    color: #FFFFFF;
-  }
-
-  .modern-footer__tagline {
-    font-size: 0.8rem;
-    color: #CBD5E1;
-  }
-
-  .modern-footer__links {
-    list-style: none;
-    display: flex;
-    flex-wrap: wrap;
-    flex-wrap: balance;
-    justify-content: center;
-    gap: 1.15rem;
-    font-size: 0.82rem;
-    font-weight: 600;
-  }
-
-  .modern-footer__links a:hover {
-    color: var(--color-brand-gold);
-  }
-
-  .modern-footer__copy {
-    font-size: 0.76rem;
-    color: #94A3B8;
-  }
-
-  @media (min-width: 900px) {
-    .modern-footer__inner {
+  @media (min-width: 768px) {
+    .td-footer__bottom {
       flex-direction: row;
       text-align: left;
     }
+  }
+
+  .td-footer__copy {
+    color: #6B7280;
+  }
+
+  .td-footer__bottom-links {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    font-family: var(--font-heading);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #9CA3AF;
+  }
+
+  .td-footer__bottom-links a:hover {
+    color: var(--color-accent-red);
   }
 </style>

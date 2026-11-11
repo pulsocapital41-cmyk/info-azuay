@@ -18,7 +18,7 @@ const { Content } = await render(article);
 const allNews = (await getCollection('noticias'))
   .filter((item) => item.id !== article.id)
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
-  .slice(0, 3);
+  .slice(0, 4);
 
 const formattedDate = article.data.pubDate.toLocaleDateString('es-EC', {
   weekday: 'long',
@@ -32,9 +32,7 @@ const categorySlug = article.data.category
   .normalize('NFD')
   .replace(/[\u0300-\u036f]/g, '');
 
-const displayCategory = article.data.category === 'Capital' ? 'Cuenca' : article.data.category;
-
-const articleUrl = new URL(Astro.url.pathname, Astro.site || 'https://puntocuenca.net').toString();
+const articleUrl = new URL(Astro.url.pathname, Astro.site || 'https://infoazuay.net').toString();
 const encodedTitle = encodeURIComponent(article.data.title);
 const encodedUrl = encodeURIComponent(articleUrl);
 const summaryText = article.data.subtitle || article.data.excerpt || '';
@@ -48,36 +46,47 @@ const heroImage = optimizeImage(article.data.image, 1200);
   article={true}
   publishedTime={article.data.pubDate.toISOString()}
   author={article.data.author}
-  category={displayCategory}
+  category={article.data.category}
 >
-  <article class="article-page container">
-    <header class="article-header">
-      <div class="article-header__meta">
-        <a href={`/categoria/${categorySlug}`} class="kicker">
-          {displayCategory}
-        </a>
-        <span class="article-header__readtime">{article.data.readTime} de lectura</span>
-      </div>
-
-      <h1 class="article-header__title">{article.data.title}</h1>
-      <p class="article-header__subtitle">{summaryText}</p>
-
-      <div class="article-header__byline">
-        <div>
-          Por <strong>{article.data.author}</strong>
+  <div class="container td-post-container">
+    <div class="td-post-layout">
+      <!-- Article Main Column -->
+      <article class="td-post-main">
+        <!-- Breadcrumb & Category -->
+        <div class="td-post-crumbs">
+          <a href="/" class="td-post-crumbs__link">Inicio</a>
+          <span class="td-post-crumbs__sep">/</span>
+          <a href={`/categoria/${categorySlug}`} class="td-cat-badge">
+            {article.data.category}
+          </a>
         </div>
-        <time datetime={article.data.pubDate.toISOString()}>{formattedDate}</time>
-      </div>
 
-      <!-- Barra de Compartir en Redes -->
-      <div class="share-bar">
-        <span class="share-bar__label">Compartir nota:</span>
-        <div class="share-bar__buttons">
+        <!-- Title & Subtitle -->
+        <h1 class="td-post-title">{article.data.title}</h1>
+        {summaryText && (
+          <p class="td-post-subtitle">{summaryText}</p>
+        )}
+
+        <!-- Author & Date Meta -->
+        <div class="td-post-meta">
+          <div class="td-post-meta__author">
+            <span class="td-post-meta__by">Por</span>
+            <strong>{article.data.author}</strong>
+          </div>
+          <span class="td-post-meta__dot">·</span>
+          <time datetime={article.data.pubDate.toISOString()}>{formattedDate}</time>
+          <span class="td-post-meta__dot">·</span>
+          <span>{article.data.readTime} de lectura</span>
+        </div>
+
+        <!-- Share Buttons -->
+        <div class="td-post-share">
+          <span class="td-post-share__label">Compartir:</span>
           <a
             href={`https://api.whatsapp.com/send?text=${encodedTitle}%20${encodedUrl}`}
             target="_blank"
             rel="noopener noreferrer"
-            class="share-btn share-btn--wa"
+            class="td-share-btn td-share-btn--wa"
             aria-label="Compartir en WhatsApp"
           >
             WhatsApp
@@ -86,264 +95,310 @@ const heroImage = optimizeImage(article.data.image, 1200);
             href={`https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`}
             target="_blank"
             rel="noopener noreferrer"
-            class="share-btn share-btn--x"
+            class="td-share-btn td-share-btn--x"
             aria-label="Compartir en X"
           >
-            X / Twitter
+            X (Twitter)
           </a>
           <a
             href={`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`}
             target="_blank"
             rel="noopener noreferrer"
-            class="share-btn share-btn--fb"
+            class="td-share-btn td-share-btn--fb"
             aria-label="Compartir en Facebook"
           >
             Facebook
           </a>
-          <button
-            type="button"
-            class="share-btn share-btn--copy"
-            id="copy-link-btn"
-            data-url={articleUrl}
-          >
-            Copiar enlace
-          </button>
         </div>
-      </div>
-    </header>
 
-    <figure class="article-figure">
-      <img
-        src={heroImage}
-        alt={article.data.title}
-        class="article-figure__img"
-        fetchpriority="high"
-      />
-      {article.data.imageCaption && (
-        <figcaption class="article-figure__caption">
-          {article.data.imageCaption}
-        </figcaption>
-      )}
-    </figure>
+        <!-- Hero Image -->
+        <figure class="td-post-figure">
+          <img
+            src={heroImage}
+            alt={article.data.title}
+            class="td-post-figure__img"
+            loading="eager"
+          />
+          {article.data.imageCaption && (
+            <figcaption class="td-post-figure__caption">
+              {article.data.imageCaption}
+            </figcaption>
+          )}
+        </figure>
 
-    <div class="article-content">
-      <Content />
-    </div>
-  </article>
+        <!-- Post Body -->
+        <div class="td-post-body">
+          <Content />
+        </div>
 
-  <section class="related-section container">
-    <div class="section-header">
-      <h2 class="section-header__title">Continúa leyendo en Punto Cuenca</h2>
-      <a href="/" class="section-header__link">Volver a portada →</a>
+        <!-- Tags -->
+        {article.data.tags && article.data.tags.length > 0 && (
+          <div class="td-post-tags">
+            <span class="td-post-tags__label">Etiquetas:</span>
+            {article.data.tags.map((tag: string) => (
+              <span class="td-post-tag">#{tag}</span>
+            ))}
+          </div>
+        )}
+      </article>
+
+      <!-- Sidebar -->
+      <aside class="td-post-sidebar">
+        <div class="td-block-header td-block-header--red">
+          <span class="td-block-title">Noticias Relacionadas</span>
+        </div>
+        <div class="td-sidebar-related">
+          {allNews.map((rel) => (
+            <NewsCard article={rel} variant="horizontal" />
+          ))}
+        </div>
+      </aside>
     </div>
-    <div class="related-grid">
-      {allNews.map((item) => (
-        <NewsCard article={item} />
-      ))}
-    </div>
-  </section>
+  </div>
 </BaseLayout>
 
-<script>
-  const copyBtn = document.getElementById('copy-link-btn');
-  copyBtn?.addEventListener('click', async () => {
-    const url = copyBtn.getAttribute('data-url') || window.location.href;
-    try {
-      await navigator.clipboard.writeText(url);
-      const original = copyBtn.textContent;
-      copyBtn.textContent = '¡Enlace copiado!';
-      setTimeout(() => {
-        copyBtn.textContent = original;
-      }, 2000);
-    } catch {
-      // Fallback
-    }
-  });
-</script>
-
 <style>
-  .article-page {
-    max-width: 880px;
-    padding-top: 2.25rem;
-    padding-bottom: 2.5rem;
+  .td-post-container {
+    padding-top: 2rem;
+    padding-bottom: 4rem;
   }
 
-  .article-header {
-    margin-bottom: 1.75rem;
+  .td-post-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
   }
 
-  .article-header__meta {
+  @media (min-width: 980px) {
+    .td-post-layout {
+      grid-template-columns: 1fr 340px;
+    }
+  }
+
+  .td-post-main {
+    background: #FFFFFF;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    padding: 1.75rem;
+  }
+
+  @media (min-width: 640px) {
+    .td-post-main {
+      padding: 2.5rem;
+    }
+  }
+
+  .td-post-crumbs {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    margin-bottom: 0.75rem;
-  }
-
-  .article-header__readtime {
-    font-size: 0.78rem;
+    gap: 0.5rem;
+    font-family: var(--font-heading);
+    font-size: 0.75rem;
     color: var(--color-ink-muted);
-    font-weight: 600;
-  }
-
-  .article-header__title {
-    font-family: var(--font-serif);
-    font-size: clamp(1.85rem, 3.8vw, 2.85rem);
-    font-weight: 800;
-    line-height: 1.14;
-    letter-spacing: -0.02em;
-    color: var(--color-ink);
     margin-bottom: 1rem;
   }
 
-  .article-header__subtitle {
-    font-family: var(--font-body);
-    font-size: 1.2rem;
-    line-height: 1.5;
+  .td-post-crumbs__link:hover {
+    color: var(--color-accent-red);
+  }
+
+  .td-post-crumbs__sep {
+    color: #D1D5DB;
+  }
+
+  .td-post-title {
+    font-family: var(--font-heading);
+    font-size: 1.85rem;
+    font-weight: 900;
+    line-height: 1.25;
+    color: var(--color-ink);
+    margin-bottom: 0.75rem;
+  }
+
+  @media (min-width: 768px) {
+    .td-post-title {
+      font-size: 2.35rem;
+    }
+  }
+
+  .td-post-subtitle {
+    font-size: 1.08rem;
+    line-height: 1.55;
     color: var(--color-ink-secondary);
     margin-bottom: 1.25rem;
   }
 
-  .article-header__byline {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 0.5rem;
-    padding: 0.85rem 0;
-    border-top: 1px solid var(--color-rule-light);
-    border-bottom: 1px solid var(--color-rule-light);
-    font-size: 0.85rem;
-    color: var(--color-ink-muted);
-    text-transform: capitalize;
-  }
-
-  .article-header__byline strong {
-    color: var(--color-ink);
-  }
-
-  /* Share Bar */
-  .share-bar {
+  .td-post-meta {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
-    padding-top: 0.9rem;
+    gap: 0.5rem;
+    font-family: var(--font-heading);
+    font-size: 0.75rem;
+    color: var(--color-ink-muted);
+    padding-block: 0.75rem;
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: 1.25rem;
   }
 
-  .share-bar__label {
-    font-size: 0.75rem;
+  .td-post-meta__by {
+    color: var(--color-ink-muted);
+    margin-right: 0.25rem;
+  }
+
+  .td-post-meta__author strong {
+    color: var(--color-ink);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .td-post-meta__dot {
+    opacity: 0.5;
+  }
+
+  /* Share Buttons */
+  .td-post-share {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .td-post-share__label {
+    font-family: var(--font-heading);
+    font-size: 0.72rem;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
     color: var(--color-ink-muted);
   }
 
-  .share-bar__buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-
-  .share-btn {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.38rem 0.75rem;
-    border-radius: 4px;
-    font-family: var(--font-sans);
-    font-size: 0.75rem;
+  .td-share-btn {
+    font-family: var(--font-heading);
+    font-size: 0.72rem;
     font-weight: 700;
-    border: 1px solid var(--color-rule-medium);
-    background: var(--color-surface);
-    color: var(--color-ink);
-    cursor: pointer;
-    transition: all 0.15s ease;
+    padding: 0.35rem 0.75rem;
+    border-radius: 3px;
+    color: #FFFFFF;
+    transition: opacity 0.15s ease;
   }
 
-  .share-btn--wa:hover {
-    background: #128C7E;
-    border-color: #128C7E;
-    color: #fff;
+  .td-share-btn:hover {
+    opacity: 0.9;
+    color: #FFFFFF;
   }
 
-  .share-btn--x:hover {
-    background: #0F1419;
-    border-color: #0F1419;
-    color: #fff;
+  .td-share-btn--wa {
+    background: #25D366;
   }
 
-  .share-btn--fb:hover {
+  .td-share-btn--x {
+    background: #000000;
+  }
+
+  .td-share-btn--fb {
     background: #1877F2;
-    border-color: #1877F2;
-    color: #fff;
   }
 
-  .share-btn--copy:hover {
-    background: var(--color-brand-blue);
-    border-color: var(--color-brand-blue);
-    color: #fff;
+  /* Hero Figure */
+  .td-post-figure {
+    margin-bottom: 2rem;
   }
 
-  .article-figure {
-    margin-bottom: 2.25rem;
-  }
-
-  .article-figure__img {
+  .td-post-figure__img {
     width: 100%;
-    border-radius: 5px;
     aspect-ratio: 16 / 9;
     object-fit: cover;
+    border-radius: 4px;
   }
 
-  .article-figure__caption {
-    font-size: 0.8rem;
+  .td-post-figure__caption {
+    font-size: 0.78rem;
     color: var(--color-ink-muted);
-    margin-top: 0.5rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid var(--color-rule-light);
+    padding-top: 0.5rem;
+    text-align: right;
   }
 
-  .article-content {
+  /* Post Body */
+  .td-post-body {
     font-family: var(--font-body);
-    font-size: 1.14rem;
+    font-size: 1.08rem;
     line-height: 1.8;
-    color: var(--color-ink);
+    color: #1F2937;
   }
 
-  .article-content :global(p) {
-    margin-bottom: 1.4rem;
+  .td-post-body :global(p) {
+    margin-bottom: 1.35rem;
   }
 
-  .article-content :global(h2) {
-    font-family: var(--font-serif);
-    font-size: 1.6rem;
+  .td-post-body :global(h2), .td-post-body :global(h3) {
+    font-family: var(--font-heading);
     font-weight: 800;
-    margin: 2.2rem 0 0.85rem;
+    color: var(--color-ink);
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .td-post-body :global(h2) {
+    font-size: 1.45rem;
+    border-left: 3px solid var(--color-accent-red);
+    padding-left: 0.75rem;
+  }
+
+  .td-post-body :global(ul), .td-post-body :global(ol) {
+    margin-bottom: 1.35rem;
+    padding-left: 1.5rem;
+  }
+
+  .td-post-body :global(li) {
+    margin-bottom: 0.45rem;
+  }
+
+  .td-post-body :global(blockquote) {
+    border-left: 4px solid var(--color-accent-red);
+    background: #F9FAFB;
+    padding: 1.15rem 1.35rem;
+    margin-block: 1.5rem;
+    font-style: italic;
+    font-size: 1.12rem;
     color: var(--color-ink);
   }
 
-  .article-content :global(blockquote) {
-    margin: 1.8rem 0;
-    padding: 1rem 1.5rem;
-    border-left: 4px solid var(--color-brand-red);
-    background: var(--color-surface);
-    font-style: italic;
-    font-size: 1.18rem;
+  /* Tags */
+  .td-post-tags {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 2.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .td-post-tags__label {
+    font-family: var(--font-heading);
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--color-ink-muted);
+  }
+
+  .td-post-tag {
+    font-family: var(--font-heading);
+    font-size: 0.72rem;
+    font-weight: 700;
+    background: #F3F4F6;
     color: var(--color-ink-secondary);
+    padding: 0.25rem 0.65rem;
+    border-radius: 2px;
   }
 
-  .related-section {
-    padding-top: 2rem;
-    padding-bottom: 2rem;
-  }
-
-  .related-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    column-gap: 1.5rem;
-    row-gap: 0;
-  }
-
-  .related-grid > :global(.grid-card) {
-    margin-block-end: 1.5rem;
+  /* Sidebar */
+  .td-sidebar-related {
+    display: flex;
+    flex-direction: column;
+    background: #FFFFFF;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
   }
 </style>
