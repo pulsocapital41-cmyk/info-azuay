@@ -1,0 +1,106 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import NewsCard from '../../components/NewsCard.astro';
+
+export async function getStaticPaths() {
+  const categories = [
+    { slug: 'cuenca', name: 'Cuenca', displayName: 'Cuenca', desc: 'Noticias locales, gestión cantonal, obras urbanas y actualidad en la Atenas del Ecuador.' },
+    { slug: 'seguridad', name: 'Seguridad', displayName: 'Seguridad', desc: 'Operativos policiales, prevención comunitaria, seguridad vial y orden ciudadano en Azuay.' },
+    { slug: 'movilidad', name: 'Movilidad', displayName: 'Movilidad', desc: 'Tranvía de Cuenca, vialidad del Austro, conexiones interprovinciales y transporte público.' },
+    { slug: 'comunidad', name: 'Comunidad', displayName: 'Comunidad', desc: 'Barrios cuencanos, servicios municipales, ambiente, educación y denuncias ciudadanas.' },
+    { slug: 'opinion', name: 'Opinión', displayName: 'Opinión', desc: 'Análisis, debate y columnas ciudadanas sobre el desarrollo del Azuay y el Austro.' },
+  ];
+
+  const allNews = await getCollection('noticias');
+
+  return categories.map((cat) => {
+    const filtered = allNews
+      .filter((item) => item.data.category === cat.name || item.data.category.toLowerCase() === cat.name.toLowerCase())
+      .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+    return {
+      params: { categoria: cat.slug },
+      props: {
+        categoryName: cat.displayName,
+        categoryDescription: cat.desc,
+        articles: filtered,
+      },
+    };
+  });
+}
+
+const { categoryName, categoryDescription, articles } = Astro.props;
+---
+
+<BaseLayout
+  title={`${categoryName} — Info Azuay`}
+  description={categoryDescription}
+>
+  <section class="category-page container">
+    <header class="category-chip-bar">
+      <span class="kicker">{categoryName}</span>
+      <p class="category-chip-bar__desc">{categoryDescription}</p>
+    </header>
+
+    {articles.length > 0 ? (
+      <div class="category-grid">
+        {articles.map((article) => (
+          <NewsCard article={article} />
+        ))}
+      </div>
+    ) : (
+      <div class="empty-state">
+        <p>Pronto publicaremos nuevas notas en la sección de {categoryName}.</p>
+        <a href="/" class="empty-state__link">Ver todas las noticias →</a>
+      </div>
+    )}
+  </section>
+</BaseLayout>
+
+<style>
+  .category-page {
+    padding-block: 2rem 3.5rem;
+  }
+
+  .category-chip-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.85rem;
+    margin-block-end: 1.75rem;
+    padding-block-end: 1rem;
+    border-bottom: 1px solid var(--color-rule-light);
+  }
+
+  .category-chip-bar__desc {
+    font-size: 0.92rem;
+    color: var(--color-ink-secondary);
+  }
+
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    column-gap: 1.5rem;
+    row-gap: 0;
+  }
+
+  .category-grid > :global(.grid-card) {
+    margin-block-end: 1.5rem;
+  }
+
+  .empty-state {
+    background: var(--color-surface);
+    border: 1px solid var(--color-rule-light);
+    padding: 3rem 2rem;
+    text-align: center;
+    border-radius: 16px;
+  }
+
+  .empty-state__link {
+    display: inline-block;
+    margin-block-start: 1rem;
+    font-weight: 700;
+    color: var(--color-brand-blue);
+  }
+</style>

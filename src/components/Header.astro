@@ -1,0 +1,456 @@
+---
+const categories = [
+  { name: 'Todas', href: '/' },
+  { name: 'Cuenca', href: '/categoria/cuenca' },
+  { name: 'Seguridad', href: '/categoria/seguridad' },
+  { name: 'Movilidad', href: '/categoria/movilidad' },
+  { name: 'Comunidad', href: '/categoria/comunidad' },
+  { name: 'Opinión', href: '/categoria/opinion' },
+];
+
+const currentPath = Astro.url.pathname;
+---
+
+<header class="modern-header">
+  <div class="gold-accent-line"></div>
+  <div class="container modern-header__inner">
+    <a href="/" class="brand-lockup" aria-label="Info Azuay - Inicio">
+      <img
+        src="/favicon.png"
+        alt="Emblema Info Azuay"
+        class="brand-lockup__icon"
+        width="46"
+        height="46"
+      />
+      <div class="brand-lockup__text">
+        <span class="brand-lockup__title">INFO <strong>AZUAY</strong></span>
+        <span class="brand-lockup__tagline">Noticias en tiempo real · El pulso del Austro</span>
+      </div>
+    </a>
+
+    <nav class="pill-nav" aria-label="Secciones principales">
+      <ul class="pill-nav__list">
+        {categories.map((cat) => {
+          const isActive =
+            cat.href === '/'
+              ? currentPath === '/'
+              : currentPath.startsWith(cat.href);
+          return (
+            <li>
+              <a
+                href={cat.href}
+                class:list={['pill-nav__link', { 'pill-nav__link--active': isActive }]}
+              >
+                {cat.label || cat.name}
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <button
+        type="button"
+        id="open-search-btn"
+        class="search-btn"
+        aria-label="Buscar noticias"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <span>Buscar</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- Modal Buscador Instantáneo -->
+<div id="search-modal" class="search-modal" aria-hidden="true">
+  <div class="search-modal__backdrop" id="close-search-backdrop"></div>
+  <div class="search-modal__dialog" role="dialog" aria-modal="true" aria-label="Buscador de noticias">
+    <div class="search-modal__header">
+      <div class="search-input-wrap">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input
+          type="search"
+          id="search-input"
+          placeholder="Buscar en Info Azuay..."
+          autocomplete="off"
+        />
+      </div>
+      <button type="button" id="close-search-btn" class="search-modal__close" aria-label="Cerrar buscador">
+        ESC
+      </button>
+    </div>
+    <div id="search-results" class="search-modal__results">
+      <p class="search-modal__hint">Escribe al menos 2 letras para filtrar noticias.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  const openBtn = document.getElementById('open-search-btn');
+  const closeBtn = document.getElementById('close-search-btn');
+  const backdrop = document.getElementById('close-search-backdrop');
+  const modal = document.getElementById('search-modal');
+  const input = document.getElementById('search-input') as HTMLInputElement | null;
+  const resultsContainer = document.getElementById('search-results');
+
+  let articlesCache: any[] | null = null;
+
+  async function loadSearchIndex() {
+    if (articlesCache) return articlesCache;
+    try {
+      const res = await fetch('/api/search.json');
+      articlesCache = await res.json();
+      return articlesCache;
+    } catch {
+      return [];
+    }
+  }
+
+  function openSearch() {
+    modal?.classList.add('is-open');
+    modal?.setAttribute('aria-hidden', 'false');
+    setTimeout(() => input?.focus(), 50);
+    loadSearchIndex();
+  }
+
+  function closeSearch() {
+    modal?.classList.remove('is-open');
+    modal?.setAttribute('aria-hidden', 'true');
+  }
+
+  openBtn?.addEventListener('click', openSearch);
+  closeBtn?.addEventListener('click', closeSearch);
+  backdrop?.addEventListener('click', closeSearch);
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal?.classList.contains('is-open')) {
+      closeSearch();
+    }
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault();
+      openSearch();
+    }
+  });
+
+  input?.addEventListener('input', async () => {
+    const query = input.value.trim().toLowerCase();
+    if (!resultsContainer) return;
+
+    if (query.length < 2) {
+      resultsContainer.innerHTML = '<p class="search-modal__hint">Escribe al menos 2 letras para filtrar noticias.</p>';
+      return;
+    }
+
+    const list = (await loadSearchIndex()) || [];
+    const matches = list.filter((item) =>
+      item.title.toLowerCase().includes(query) ||
+      item.subtitle.toLowerCase().includes(query) ||
+      item.category.toLowerCase().includes(query) ||
+      item.author.toLowerCase().includes(query)
+    );
+
+    if (matches.length === 0) {
+      resultsContainer.innerHTML = `<p class="search-modal__hint">No se encontraron notas para "<strong>${query}</strong>".</p>`;
+      return;
+    }
+
+    resultsContainer.innerHTML = matches
+      .slice(0, 8)
+      .map(
+        (item) => `
+        <a href="/noticias/${item.slug}" class="search-result-item">
+          <span class="search-result-item__cat">${item.category === 'Capital' ? 'Cuenca' : item.category}</span>
+          <h4 class="search-result-item__title">${item.title}</h4>
+          <p class="search-result-item__sub">${item.subtitle}</p>
+        </a>
+      `
+      )
+      .join('');
+  });
+</script>
+
+<style>
+  .modern-header {
+    position: sticky;
+    top: 0;
+    z-index: 60;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--color-rule-light);
+    box-shadow: 0 4px 20px -10px rgba(7, 35, 62, 0.08);
+  }
+
+  .gold-accent-line {
+    block-size: 4px;
+    background: linear-gradient(90deg, var(--color-brand-blue) 0%, var(--color-brand-gold) 50%, var(--color-brand-blue) 100%);
+  }
+
+  .modern-header__inner {
+    display: flex;
+    align-items: safe center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block: 0.85rem;
+    flex-wrap: wrap;
+  }
+
+  .brand-lockup {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-shrink: 0;
+  }
+
+  .brand-lockup__icon {
+    inline-size: 44px;
+    block-size: 44px;
+    object-fit: contain;
+  }
+
+  .brand-lockup__text {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .brand-lockup__title {
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--color-brand-blue);
+    line-height: 1.05;
+  }
+
+  .brand-lockup__title strong {
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    color: var(--color-ink);
+  }
+
+  .brand-lockup__tagline {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--color-brand-gold);
+    margin-block-start: 0.15rem;
+  }
+
+  .pill-nav {
+    order: 3;
+    inline-size: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .pill-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .pill-nav__list {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: var(--color-paper);
+    padding: 0.3rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-rule-light);
+    inline-size: max-content;
+  }
+
+  .pill-nav__link {
+    display: inline-block;
+    padding: 0.42rem 0.95rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--color-ink-secondary);
+    white-space: nowrap;
+  }
+
+  .pill-nav__link:hover {
+    color: var(--color-brand-blue);
+    background: rgba(7, 35, 62, 0.05);
+  }
+
+  .pill-nav__link--active {
+    background: var(--color-brand-blue);
+    color: #FFFFFF;
+    box-shadow: 0 2px 8px rgba(7, 35, 62, 0.2);
+  }
+
+  .pill-nav__link--active:hover {
+    background: var(--color-brand-blue-dark);
+    color: #FFFFFF;
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-inline-start: auto;
+  }
+
+  .search-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    background: var(--color-paper);
+    border: 1px solid var(--color-rule-light);
+    color: var(--color-brand-blue);
+    padding: 0.5rem 0.95rem;
+    border-radius: 999px;
+    font-family: var(--font-sans);
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .search-btn:hover {
+    border-color: var(--color-brand-gold);
+    background: var(--color-brand-gold-soft);
+  }
+
+  /* Search Modal */
+  .search-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: none;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 4rem 1rem 1rem;
+  }
+
+  .search-modal.is-open {
+    display: flex;
+  }
+
+  .search-modal__backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(7, 35, 62, 0.6);
+    backdrop-filter: blur(4px);
+  }
+
+  .search-modal__dialog {
+    position: relative;
+    z-index: 1;
+    inline-size: 100%;
+    max-inline-size: 620px;
+    background: var(--color-surface);
+    border-radius: 16px;
+    box-shadow: 0 24px 48px rgba(7, 35, 62, 0.25);
+    border: 1px solid var(--color-rule-light);
+    overflow: clip;
+  }
+
+  .search-modal__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--color-rule-light);
+    gap: 0.75rem;
+  }
+
+  .search-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    flex: 1;
+    color: var(--color-brand-blue);
+  }
+
+  .search-input-wrap input {
+    inline-size: 100%;
+    border: none;
+    outline: none;
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    color: var(--color-ink);
+    background: transparent;
+  }
+
+  .search-modal__close {
+    background: var(--color-paper);
+    border: 1px solid var(--color-rule-medium);
+    border-radius: 6px;
+    padding: 0.25rem 0.55rem;
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: var(--color-ink-muted);
+    cursor: pointer;
+  }
+
+  .search-modal__results {
+    max-block-size: 65dvh;
+    overflow-y: auto;
+    scrollbar-gutter: stable;
+    overscroll-behavior: contain;
+    padding: 0.75rem 1.25rem 1.25rem;
+  }
+
+  .search-modal__hint {
+    font-size: 0.88rem;
+    color: var(--color-ink-muted);
+    padding: 1rem 0;
+    text-align: center;
+  }
+
+  :global(.search-result-item) {
+    display: block;
+    padding: 0.85rem 0.75rem;
+    border-bottom: 1px solid var(--color-rule-light);
+    border-radius: 8px;
+  }
+
+  :global(.search-result-item:hover) {
+    background: var(--color-paper);
+  }
+
+  :global(.search-result-item__cat) {
+    font-size: 0.68rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-brand-gold);
+  }
+
+  :global(.search-result-item__title) {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-ink);
+    margin: 0.15rem 0 0.25rem;
+  }
+
+  :global(.search-result-item__sub) {
+    font-size: 0.82rem;
+    color: var(--color-ink-secondary);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    line-clamp: 2;
+    overflow: clip;
+  }
+
+  @media (min-width: 960px) {
+    .pill-nav {
+      order: 0;
+      inline-size: auto;
+    }
+
+    .header-actions {
+      margin-inline-start: 0;
+    }
+  }
+</style>

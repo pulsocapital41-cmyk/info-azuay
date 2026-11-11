@@ -1,0 +1,36 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import NewsCard from '../components/NewsCard.astro';
+
+const allNews = (await getCollection('noticias')).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+---
+
+<BaseLayout>
+  <section class="grid-portal container">
+    <div class="news-cards-grid">
+      {allNews.map((story, idx) => (
+        <NewsCard article={story} featured={idx === 0} />
+      ))}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .grid-portal {
+    padding-block: 2.25rem 3.5rem;
+  }
+
+  .news-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    column-gap: 1.5rem;
+    row-gap: 0;
+  }
+
+  .news-cards-grid > :global(.grid-card) {
+    margin-block-end: 1.5rem;
+  }
+</style>

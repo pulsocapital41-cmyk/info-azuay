@@ -1,0 +1,108 @@
+---
+const year = new Date().getFullYear();
+---
+
+<footer class="modern-footer">
+  <div class="container modern-footer__inner">
+    <div class="modern-footer__brand">
+      <img
+        src="/logo-info-azuay.png"
+        alt="Info Azuay"
+        class="modern-footer__logo"
+        width="150"
+        height="108"
+      />
+      <div>
+        <strong class="modern-footer__name">INFO AZUAY</strong>
+        <p class="modern-footer__tagline">El pulso informativo del Austro ecuatoriano · Cuenca, Azuay</p>
+      </div>
+    </div>
+
+    <ul class="modern-footer__links">
+      <li><a href="/">Todas</a></li>
+      <li><a href="/categoria/cuenca">Cuenca</a></li>
+      <li><a href="/categoria/seguridad">Seguridad</a></li>
+      <li><a href="/categoria/movilidad">Movilidad</a></li>
+      <li><a href="/categoria/comunidad">Comunidad</a></li>
+      <li><a href="/categoria/opinion">Opinión</a></li>
+      <li><a href="/rss.xml">RSS</a></li>
+      <li><a href="https://central.neuronamedios.com" target="_blank" rel="noopener noreferrer">Central Editorial</a></li>
+    </ul>
+
+    <p class="modern-footer__copy">© {year} Info Azuay. Todos los derechos reservados.</p>
+  </div>
+</footer>
+
+<style>
+  .modern-footer {
+    margin-block-start: auto;
+    background: var(--color-brand-blue);
+    color: #E2E8F0;
+    border-top: 3px solid var(--color-brand-gold);
+    padding-block: 2.25rem;
+  }
+
+  .modern-footer__inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    text-align: center;
+  }
+
+  .modern-footer__brand {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    text-align: left;
+  }
+
+  .modern-footer__logo {
+    background: #FFFFFF;
+    padding: 0.45rem;
+    border-radius: 10px;
+    block-size: 58px;
+    inline-size: auto;
+  }
+
+  .modern-footer__name {
+    display: block;
+    font-size: 1rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    color: #FFFFFF;
+  }
+
+  .modern-footer__tagline {
+    font-size: 0.8rem;
+    color: #CBD5E1;
+  }
+
+  .modern-footer__links {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    flex-wrap: balance;
+    justify-content: center;
+    gap: 1.15rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+  }
+
+  .modern-footer__links a:hover {
+    color: var(--color-brand-gold);
+  }
+
+  .modern-footer__copy {
+    font-size: 0.76rem;
+    color: #94A3B8;
+  }
+
+  @media (min-width: 900px) {
+    .modern-footer__inner {
+      flex-direction: row;
+      text-align: left;
+    }
+  }
+</style>
