@@ -19,7 +19,7 @@ const dateFormatted = new Date(pubDate).toLocaleDateString('es-EC', {
 {variant === 'hero-main' && (
   <article class="td-card-hero-main">
     <a href={`/noticias/${slug}`} class="td-card-hero-main__img-wrap">
-      <img src={image} alt={title} class="td-card-hero-main__img" loading="eager" />
+      <img src={image} alt={title} class="td-card-hero-main__img" loading="eager" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=1200&q=80'" />
       <div class="td-card-hero-main__overlay"></div>
     </a>
     <div class="td-card-hero-main__content">
@@ -43,7 +43,7 @@ const dateFormatted = new Date(pubDate).toLocaleDateString('es-EC', {
 {variant === 'hero-sub' && (
   <article class="td-card-hero-sub">
     <a href={`/noticias/${slug}`} class="td-card-hero-sub__img-wrap">
-      <img src={image} alt={title} class="td-card-hero-sub__img" loading="lazy" />
+      <img src={image} alt={title} class="td-card-hero-sub__img" loading="lazy" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=1200&q=80'" />
       <div class="td-card-hero-sub__overlay"></div>
     </a>
     <div class="td-card-hero-sub__content">
@@ -63,7 +63,7 @@ const dateFormatted = new Date(pubDate).toLocaleDateString('es-EC', {
 {variant === 'horizontal' && (
   <article class="td-card-horizontal">
     <a href={`/noticias/${slug}`} class="td-card-horizontal__img-wrap">
-      <img src={image} alt={title} class="td-card-horizontal__img" loading="lazy" />
+      <img src={image} alt={title} class="td-card-horizontal__img" loading="lazy" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=1200&q=80'" />
       <span class="td-cat-badge td-card-horizontal__cat-badge">{category}</span>
     </a>
     <div class="td-card-horizontal__body">

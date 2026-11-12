@@ -5,7 +5,7 @@ excerpt: "Las unidades operarán hasta las 23:30 los viernes y sábados. La medi
 category: "Movilidad"
 author: "Redacción Movilidad"
 pubDate: 2026-11-11T01:00:00.000Z
-image: "https://images.unsplash.com/photo-1517649763962-0c623266ddc0?auto=format&fit=crop&w=1200&q=80"
+image: "https://images.unsplash.com/photo-1549488344-1f9b8d2bd1f3?auto=format&fit=crop&w=1200&q=80"
 imageCaption: "Unidad tranviaria en la intersección de la calle Gran Colombia y Huayna Cápac en el Centro Histórico de Cuenca."
 featured: false
 breaking: false
